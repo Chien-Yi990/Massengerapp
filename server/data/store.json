@@ -1,0 +1,98 @@
+{
+  "users": [
+    {
+      "uid": "demo_one",
+      "email": "demo1@example.com",
+      "password": "123456",
+      "displayName": "Demo One",
+      "displayNameLower": "demo one",
+      "photoURL": "",
+      "friendIds": [
+        "demo_two",
+        "demo_three"
+      ],
+      "createdAt": 1782486596069,
+      "updatedAt": 1782486675882
+    },
+    {
+      "uid": "demo_two",
+      "email": "demo2@example.com",
+      "password": "123456",
+      "displayName": "Demo Two",
+      "displayNameLower": "demo two",
+      "photoURL": "",
+      "friendIds": [
+        "demo_one",
+        "demo_three"
+      ],
+      "createdAt": 1782486596069,
+      "updatedAt": 1782486596069
+    },
+    {
+      "uid": "demo_three",
+      "email": "demo3@example.com",
+      "password": "123456",
+      "displayName": "Demo Three",
+      "displayNameLower": "demo three",
+      "photoURL": "",
+      "friendIds": [
+        "demo_one",
+        "demo_two"
+      ],
+      "createdAt": 1782486596069,
+      "updatedAt": 1782486596069
+    }
+  ],
+  "chats": [
+    {
+      "id": "demo_one_demo_two",
+      "participants": [
+        "demo_one",
+        "demo_two"
+      ],
+      "readAtByUser": {
+        "demo_one": 1782486794629,
+        "demo_two": 1782486794633
+      },
+      "updatedAt": 1782486794629,
+      "lastMessage": "automated test message",
+      "lastMessageAt": 1782486794629
+    },
+    {
+      "id": "demo_one_demo_three",
+      "participants": [
+        "demo_one",
+        "demo_three"
+      ],
+      "readAtByUser": {},
+      "updatedAt": 1782486596069
+    },
+    {
+      "id": "demo_three_demo_two",
+      "participants": [
+        "demo_three",
+        "demo_two"
+      ],
+      "readAtByUser": {},
+      "updatedAt": 1782486596069
+    }
+  ],
+  "messages": {
+    "demo_one_demo_two": [
+      {
+        "id": "mqv2jlic5b0a4ku1",
+        "senderId": "demo_one",
+        "text": "hello from demo one",
+        "createdAt": 1782486675876
+      },
+      {
+        "id": "mqv2m551m1cpvcd9",
+        "senderId": "demo_one",
+        "text": "automated test message",
+        "createdAt": 1782486794629
+      }
+    ],
+    "demo_one_demo_three": [],
+    "demo_three_demo_two": []
+  }
+}
