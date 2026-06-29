@@ -7,13 +7,7 @@
       "**/*"
     ],
     "ios": {
-      "supportsTabletMode": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+      "supportsTablet": true
     },
     "plugins": [
       [
@@ -22,7 +16,8 @@
           "photosPermission": "允許應用訪問你的相冊以設定頭像",
           "cameraPermission": "允許應用訪問相機"
         }
-      ]
+      ],
+      "expo-font"
     ]
   }
 }

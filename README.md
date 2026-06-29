@@ -15,31 +15,58 @@ server/data/store.json
 11256038 陳紹豪
 11156050 莊閎翔
 
-## 啟動方式
+## 驗收當天：兩台電腦 Demo（建議方式）
 
-先啟動 API server：
+兩台電腦連到同一個 Wi-Fi。選一台當「主機」，只需要在主機從 GitHub 下載並啟動專案：
+
+```bash
+git clone https://github.com/Chien-Yi990/Massengerapp.git
+cd Massengerapp
+npm ci
+npm run demo
+```
+
+終端機會顯示類似以下網址：
+
+```text
+本機與第二台電腦請開啟：http://192.168.1.100:8081
+```
+
+在兩台電腦的瀏覽器都開啟終端機實際顯示的網址，分別登入不同帳號：
+
+- 電腦 A：`demo1@example.com` / `123456`
+- 電腦 B：`demo2@example.com` / `123456`
+
+接著可直接測試互傳訊息、未讀數、好友列表。若 Windows 防火牆跳出詢問，請允許 Node.js 使用「私人網路」。
+
+> 第二台電腦不可輸入 `localhost:8081`，必須使用主機終端機顯示的 `192.168.x.x:8081` 網址。
+
+### 若自動判斷到錯誤的 IP
+
+主機有 VPN、虛擬網卡時，可手動指定主機的 Wi-Fi IPv4：
+
+```powershell
+$env:DEMO_HOST="192.168.1.100"
+npm run demo
+```
+
+可在 Windows 執行 `ipconfig`，從「無線區域網路介面卡 Wi-Fi」找到 IPv4 位址。
+
+### 一般開發啟動方式
+
+第一個終端機：
 
 ```bash
 npm run api
 ```
 
-再開另一個終端機啟動 Expo Web：
+第二個終端機：
 
 ```bash
-npx expo start --web --clear
+npm run web
 ```
 
-開啟：
-
-```text
-http://localhost:8081
-```
-
-API server 預設位置：
-
-```text
-http://localhost:3001
-```
+此方式預設只供同一台電腦使用，網址為 `http://localhost:8081`，API 為 `http://localhost:3001`。
 
 ## 測試帳號
 
@@ -79,15 +106,27 @@ API server 儲存以下資料：
 - `chats`：聊天室、參與者、最後訊息、最後訊息時間、已讀時間
 - `messages`：各聊天室訊息
 
-## 如何測試
+## 驗收流程
 
-1. 啟動 `npm run api`
-2. 啟動 `npx expo start --web --clear`
-3. 登入 `demo1@example.com`，密碼 `123456`
-4. 到「好友」頁確認 demo 帳號已互加好友
-5. 到「聊天」頁開啟 Demo Two 或 Demo Three 的聊天室
-6. 送出訊息，確認訊息、時間、頭像/首字母會顯示
-7. 用另一個瀏覽器或登出後登入另一個 demo 帳號，確認未讀數和訊息更新
+1. 兩台電腦開啟 `npm run demo` 顯示的相同網址。
+2. 電腦 A 登入 `demo1@example.com`，電腦 B 登入 `demo2@example.com`。
+3. 到「好友」頁，確認 Demo One 與 Demo Two 都在好友清單。
+4. 到「聊天」頁開啟彼此的聊天室。
+5. 電腦 A 傳訊息，約 1.5 秒內確認電腦 B 顯示新訊息與時間。
+6. 回到聊天列表確認最後訊息及未讀數，再進入聊天室確認已標記為已讀。
+7. 如需展示加好友：兩台分別註冊新帳號，用 Email 搜尋對方並加入好友。
+
+## 自動檢查
+
+下載依賴後可執行：
+
+```bash
+npm test
+npm run check
+```
+
+- `npm test`：實際啟動獨立 API，測試註冊、搜尋、加好友、聊天室、傳訊息及未讀。
+- `npm run check`：檢查 TypeScript 與 Expo 專案設定、相依套件版本。
 
 ## API 測試結果
 
@@ -103,3 +142,10 @@ API server 儲存以下資料：
 - 未讀數增加
 - 進入聊天室後標記已讀
 - 修改使用者名稱
+
+## 常見問題
+
+- 第二台打不開網址：確認兩台在同一個 Wi-Fi，並允許 Windows 防火牆的私人網路存取。
+- 網址顯示 VPN／虛擬網卡 IP：用上方 `DEMO_HOST` 手動指定 Wi-Fi IPv4。
+- Port 已被使用：先關閉舊的 Node.js／Expo 終端機，再執行 `npm run demo`。
+- GitHub repository 是 private：驗收主機必須先登入有權限的 GitHub 帳號才能 clone。

@@ -3,8 +3,11 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = Number(process.env.PORT || 3001);
-const DATA_DIR = path.join(__dirname, 'data');
-const DATA_FILE = path.join(DATA_DIR, 'store.json');
+const HOST = process.env.HOST || '0.0.0.0';
+const DATA_FILE = process.env.DATA_FILE
+  ? path.resolve(process.env.DATA_FILE)
+  : path.join(__dirname, 'data', 'store.json');
+const DATA_DIR = path.dirname(DATA_FILE);
 
 const now = () => Date.now();
 const normalize = (value) => String(value || '').trim().toLowerCase();
@@ -429,6 +432,6 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`API server listening on http://localhost:${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`API server listening on http://${HOST}:${PORT}`);
 });

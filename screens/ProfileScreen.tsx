@@ -92,7 +92,8 @@ const ProfileScreen = () => {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.8,
+      base64: true,
+      quality: 0.5,
     });
 
     if (result.canceled) {
@@ -101,8 +102,12 @@ const ProfileScreen = () => {
 
     setSaving(true);
     try {
-      await updateUserProfile(currentUser.uid, { photoURL: result.assets[0].uri });
-      Alert.alert('已更新', '頭像已儲存在本機資料庫');
+      const asset = result.assets[0];
+      const photoURL = asset.base64
+        ? `data:${asset.mimeType || 'image/jpeg'};base64,${asset.base64}`
+        : asset.uri;
+      await updateUserProfile(currentUser.uid, { photoURL });
+      Alert.alert('已更新', '頭像已儲存在共用伺服器');
       await loadProfile();
     } catch (error: any) {
       Alert.alert('頭像更新失敗', error.message ?? '請稍後再試');

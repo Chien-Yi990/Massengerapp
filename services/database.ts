@@ -221,5 +221,4 @@ export const sendMessage = async (chatId: string, senderId: string, text: string
 
 export const markChatRead = async (chatId: string, uid: string) => {
   await post<{ ok: boolean }>('/chats/read', { chatId, uid });
-  notifyData();
 };
