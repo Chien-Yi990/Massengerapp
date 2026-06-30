@@ -1,151 +1,107 @@
-# MyChatApp
+# MyChatApp（Firebase 雲端版）
 
-React Native Expo 聊天 App。資料目前透過 Node.js HTTP API 儲存在伺服器端 JSON 檔案：
-
-```text
-server/data/store.json
-```
-
-前端不再直接把主要資料存在瀏覽器本機，而是透過網路 API 存取使用者、好友、聊天室、訊息、未讀狀態等資料。
+React Native Expo 聊天 App。帳號由 Firebase Authentication 管理，好友、聊天室與訊息儲存在 Cloud Firestore。教師機與學生端只需各自能連上 Internet，不必連同一個 Wi-Fi，也不必執行本機 API server。
 
 ## 組員名單
-11256028 簡翊安
-11256027 黃楷恩
-11256035 劉張祥恩
-11256038 陳紹豪
-11156050 莊閎翔
 
-## 驗收當天：兩台電腦 Demo（建議方式）
+- 11256028 簡翊安
+- 11256027 黃楷恩
+- 11256035 劉張祥恩
+- 11256038 陳紹豪
+- 11156050 莊閎翔
 
-兩台電腦連到同一個 Wi-Fi。選一台當「主機」，只需要在主機從 GitHub 下載並啟動專案：
+Demo 開始前請先在 GitHub repository 的這一段顯示組員名單。
 
-```bash
-git clone https://github.com/Chien-Yi990/Massengerapp.git
-cd Massengerapp
-npm ci
-npm run demo
-```
+## Firebase 狀態
 
-終端機會顯示類似以下網址：
+本組已完成下列雲端設定，教師機與學生端不需要再設定 Firebase：
 
-```text
-本機與第二台電腦請開啟：http://192.168.1.100:8081
-```
+- Firebase 專案：`gen-lang-client-0363855150`
+- Email/Password Authentication
+- Cloud Firestore
+- Firestore 安全規則
 
-在兩台電腦的瀏覽器都開啟終端機實際顯示的網址，分別登入不同帳號：
-
-- 電腦 A：`demo1@example.com` / `123456`
-- 電腦 B：`demo2@example.com` / `123456`
-
-接著可直接測試互傳訊息、未讀數、好友列表。若 Windows 防火牆跳出詢問，請允許 Node.js 使用「私人網路」。
-
-> 第二台電腦不可輸入 `localhost:8081`，必須使用主機終端機顯示的 `192.168.x.x:8081` 網址。
-
-### 若自動判斷到錯誤的 IP
-
-主機有 VPN、虛擬網卡時，可手動指定主機的 Wi-Fi IPv4：
+Firebase Web App 公開設定已內建在程式中，因此從 GitHub clone 後不需要新增 `.env`。只有組員修改 `firestore.rules` 時，才需要登入 Firebase 並重新部署：
 
 ```powershell
-$env:DEMO_HOST="192.168.1.100"
+npx firebase-tools login
+npm run firebase:deploy
+```
+
+Firebase Web App 設定值不是伺服器私鑰，因此已作為程式的預設設定提交；`.env` 仍可用來覆蓋它。不要把 service-account JSON 或 Admin SDK 私鑰放進 GitHub。
+
+## 教師機啟動步驟
+
+教師機需先安裝 [Git](https://git-scm.com/) 與 [Node.js LTS](https://nodejs.org/)，並確定可以連上 Internet。
+
+在教師機開啟 PowerShell，依序執行：
+
+```powershell
+# 1. 只能從 GitHub 取得程式
+git clone https://github.com/Chien-Yi990/Massengerapp.git
+
+# 2. 進入專案
+cd Massengerapp
+
+# 3. 安裝鎖定版本的套件
+npm ci
+
+# 4. 啟動 App
 npm run demo
 ```
 
-可在 Windows 執行 `ipconfig`，從「無線區域網路介面卡 Wi-Fi」找到 IPv4 位址。
+終端機出現 `Waiting on http://localhost:8081` 後，在教師機瀏覽器開啟：
 
-### 一般開發啟動方式
-
-第一個終端機：
-
-```bash
-npm run api
+```text
+http://localhost:8081
 ```
 
-第二個終端機：
+不要關閉執行 `npm run demo` 的 PowerShell 視窗；Demo 結束後可在該視窗按 `Ctrl+C` 停止。
 
-```bash
-npm run web
+## 學生端啟動步驟
+
+學生端可使用另一台已安裝 Git 與 Node.js 的電腦，執行與教師機相同的四個指令。每台電腦都開啟自己的 `http://localhost:8081`，資料會透過 Firebase 同步，不需要連接相同 Wi-Fi、不需要設定 IP，也不需要開啟防火牆 port。
+
+若使用 Android/iPhone，可在專案中執行 `npm start`，再使用 Expo Go 開啟。Firebase JS SDK 可同時支援 Web、Android 與 iOS。
+
+## Demo 建議流程
+
+1. 在 GitHub README 顯示上方組員名單。
+2. 教師機與至少兩個學生端都開啟 App。
+3. 兩位學生先各自註冊帳號，記下 Email。
+4. 教師機註冊一個新帳號。
+5. 教師機到「好友」，用 Email 搜尋並加入兩位學生。
+6. 教師機分別進入兩個聊天室，傳送不同訊息。
+7. 兩位學生各回覆至少兩則訊息。
+8. 教師機確認收到回覆後，按返回並停在底部的「聊天」tab（聊天室列表）。
+
+建議準備三組不重複 Email；Firebase 密碼至少 6 個字元。若重複演示，可直接登入原帳號，或在 Firebase Console 刪除測試帳號及相關 Firestore 文件後重來。
+
+## 資料結構
+
+```text
+users/{uid}
+chats/{由兩個 uid 組成的 chatId}
+chats/{chatId}/messages/{messageId}
 ```
 
-此方式預設只供同一台電腦使用，網址為 `http://localhost:8081`，API 為 `http://localhost:3001`。
+Firestore 使用 snapshot listener 即時通知其他裝置，不再每 1.5 秒輪詢。加好友及建立聊天室使用 transaction，訊息及聊天室摘要使用 batched write，避免只寫入一半。
 
-## 測試帳號
+## 驗證
 
-系統會自動建立三個測試帳號，且三個帳號已互相加入好友：
-
-| Email | 密碼 |
-| --- | --- |
-| demo1@example.com | 123456 |
-| demo2@example.com | 123456 |
-| demo3@example.com | 123456 |
-
-也可以自行註冊新帳號，並透過 UID、Email 或顯示名稱搜尋其他使用者加入好友。
-
-## 作業要求檢查表
-
-| 狀態 | 作業要求 | 目前狀況 |
-| --- | --- | --- |
-| ✓ | 以下所有的資料都需要能存在網路上 | 使用 Node.js HTTP API 儲存在 server 端 `server/data/store.json` |
-| ✓ | 跟期中一樣有跳轉頁跟 tab 標籤頁 | 有登入頁、Bottom Tab、聊天室 Stack 跳轉頁 |
-| ✓ | 註冊帳號、登入，帳號是 email | 支援 email 註冊與登入 |
-| ✓ | 把另一個帳號加入好友，可以透過 id、帳號或 email | 可用 UID、Email、顯示名稱搜尋並加入好友 |
-| ✓ | 至少註冊三個以上的帳號，然後互加好友 | 內建 3 個 demo 帳號，且已互相加入好友 |
-| ✓ | 不同好友的聊天室都有自己的聊天訊息 | 每組好友會建立獨立聊天室與訊息列表 |
-| ✓ | 聊天訊息顯示時間 | 訊息會顯示送出時間 |
-| ✓ | 聊天訊息顯示頭像 optional | 對方訊息會顯示頭像/名稱首字母 |
-| ✓ | 帳號設定可以設定名字、修改密碼、變更頭像等 | 個人頁可修改名稱、密碼、頭像 |
-| ✓ | 好友列表跟聊天室列表 | 有好友頁與聊天室列表頁 |
-| ✓ | 聊天室列表如果該聊天室有訊息，需顯示最後一筆訊息含時間 | 聊天室列表會顯示最後訊息與時間 |
-| ✓ | 聊天訊息可以半即時在雙方畫面上顯示 optional | 前端每 1.5 秒 polling API，達成半即時更新 |
-| ✓ | 未讀 optional | 聊天室列表會顯示未讀數，進入聊天室會標記已讀 |
-
-## 資料內容
-
-API server 儲存以下資料：
-
-- `users`：帳號、Email、顯示名稱、密碼、頭像、好友 ID
-- `chats`：聊天室、參與者、最後訊息、最後訊息時間、已讀時間
-- `messages`：各聊天室訊息
-
-## 驗收流程
-
-1. 兩台電腦開啟 `npm run demo` 顯示的相同網址。
-2. 電腦 A 登入 `demo1@example.com`，電腦 B 登入 `demo2@example.com`。
-3. 到「好友」頁，確認 Demo One 與 Demo Two 都在好友清單。
-4. 到「聊天」頁開啟彼此的聊天室。
-5. 電腦 A 傳訊息，約 1.5 秒內確認電腦 B 顯示新訊息與時間。
-6. 回到聊天列表確認最後訊息及未讀數，再進入聊天室確認已標記為已讀。
-7. 如需展示加好友：兩台分別註冊新帳號，用 Email 搜尋對方並加入好友。
-
-## 自動檢查
-
-下載依賴後可執行：
-
-```bash
+```powershell
 npm test
 npm run check
 ```
 
-- `npm test`：實際啟動獨立 API，測試註冊、搜尋、加好友、聊天室、傳訊息及未讀。
-- `npm run check`：檢查 TypeScript 與 Expo 專案設定、相依套件版本。
-
-## API 測試結果
-
-已測試：
-
-- 三個 demo 帳號登入
-- 用 Email 搜尋使用者
-- 加好友
-- 取得好友列表
-- 取得聊天室列表
-- 送出聊天訊息
-- 顯示最後一筆訊息與時間
-- 未讀數增加
-- 進入聊天室後標記已讀
-- 修改使用者名稱
+`npm test` 檢查 Firebase 實作與規則檔是否齊全；`npm run check` 執行 TypeScript 與 Expo 環境檢查。真正的跨裝置資料驗收仍需部署規則並連上同一個 Firebase 專案。
 
 ## 常見問題
 
-- 第二台打不開網址：確認兩台在同一個 Wi-Fi，並允許 Windows 防火牆的私人網路存取。
-- 網址顯示 VPN／虛擬網卡 IP：用上方 `DEMO_HOST` 手動指定 Wi-Fi IPv4。
-- Port 已被使用：先關閉舊的 Node.js／Expo 終端機，再執行 `npm run demo`。
-- GitHub repository 是 private：驗收主機必須先登入有權限的 GitHub 帳號才能 clone。
+- `git clone` 顯示找不到指令：先安裝 Git，再重新開啟 PowerShell。
+- `npm` 顯示找不到指令：先安裝 Node.js LTS，再重新開啟 PowerShell。
+- 8081 已被占用：關閉先前的 Expo 視窗，或在該視窗按 `Ctrl+C` 後重啟。
+- 顯示「Firebase 尚未完成設定」：確認 GitHub 下載的是最新版本後重啟 Expo。
+- 顯示權限不足：執行 `npm run firebase:deploy`，並確認 `.firebaserc` 專案正確。
+- 搜尋不到使用者：對方必須先完成 App 註冊；建議用完整 Email 搜尋。
+- 教師機收不到訊息：確認所有裝置可以連上 Internet，並且都使用最新 GitHub 版本。

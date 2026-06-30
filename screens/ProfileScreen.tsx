@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,8 +9,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { FontAwesome } from '@expo/vector-icons';
 import {
   getCurrentUser,
   getUserProfile,
@@ -83,39 +80,6 @@ const ProfileScreen = () => {
     }
   };
 
-  const pickImage = async () => {
-    if (!currentUser) {
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      base64: true,
-      quality: 0.5,
-    });
-
-    if (result.canceled) {
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const asset = result.assets[0];
-      const photoURL = asset.base64
-        ? `data:${asset.mimeType || 'image/jpeg'};base64,${asset.base64}`
-        : asset.uri;
-      await updateUserProfile(currentUser.uid, { photoURL });
-      Alert.alert('已更新', '頭像已儲存在共用伺服器');
-      await loadProfile();
-    } catch (error: any) {
-      Alert.alert('頭像更新失敗', error.message ?? '請稍後再試');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   if (!profile) {
     return (
       <View style={styles.center}>
@@ -128,16 +92,9 @@ const ProfileScreen = () => {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
-          {profile.photoURL ? (
-            <Image source={{ uri: profile.photoURL }} style={styles.profileImage} />
-          ) : (
-            <View style={styles.profileImageFallback}>
-              <Text style={styles.profileInitial}>{getInitial(profile.displayName)}</Text>
-            </View>
-          )}
-          <TouchableOpacity style={styles.editButton} onPress={pickImage}>
-            <FontAwesome name="camera" color="#FFFFFF" size={16} />
-          </TouchableOpacity>
+          <View style={styles.profileImageFallback}>
+            <Text style={styles.profileInitial}>{getInitial(profile.displayName)}</Text>
+          </View>
         </View>
 
         <Text style={styles.userName}>{profile.displayName}</Text>
@@ -214,14 +171,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     position: 'relative',
   },
-  profileImage: {
-    backgroundColor: '#E4E6EB',
-    borderColor: '#0A66C2',
-    borderRadius: 60,
-    borderWidth: 3,
-    height: 120,
-    width: 120,
-  },
   profileImageFallback: {
     alignItems: 'center',
     backgroundColor: '#E7F0FA',
@@ -236,19 +185,6 @@ const styles = StyleSheet.create({
     color: '#0A66C2',
     fontSize: 42,
     fontWeight: '700',
-  },
-  editButton: {
-    alignItems: 'center',
-    backgroundColor: '#0A66C2',
-    borderColor: '#FFFFFF',
-    borderRadius: 20,
-    borderWidth: 3,
-    bottom: 0,
-    height: 40,
-    justifyContent: 'center',
-    position: 'absolute',
-    right: 0,
-    width: 40,
   },
   userName: {
     color: '#000',

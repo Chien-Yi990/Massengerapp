@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -49,6 +49,7 @@ const ChatStack = () => (
 export default function App() {
   const [user, setUser] = useState<LocalUser | null>(null);
   const [booting, setBooting] = useState(true);
+  const [bootError, setBootError] = useState('');
 
   useEffect(() => {
     let unsubscribe = () => {};
@@ -60,7 +61,10 @@ export default function App() {
           setBooting(false);
         });
       })
-      .catch(() => setBooting(false));
+      .catch((error: Error) => {
+        setBootError(error.message);
+        setBooting(false);
+      });
 
     return () => unsubscribe();
   }, []);
@@ -69,6 +73,16 @@ export default function App() {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator color="#0A66C2" size="large" />
+      </View>
+    );
+  }
+
+  if (bootError) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorTitle}>Firebase 尚未完成設定</Text>
+        <Text style={styles.errorMessage}>{bootError}</Text>
+        <Text style={styles.errorHint}>請依 README 的「Firebase 一次性設定」完成後重新啟動。</Text>
       </View>
     );
   }
@@ -144,3 +158,31 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  errorContainer: {
+    alignItems: 'center',
+    backgroundColor: '#EEF2F6',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+  },
+  errorTitle: {
+    color: '#B42318',
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  errorMessage: {
+    color: '#344054',
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: 'center',
+  },
+  errorHint: {
+    color: '#667085',
+    fontSize: 13,
+    marginTop: 12,
+    textAlign: 'center',
+  },
+});

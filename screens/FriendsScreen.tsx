@@ -60,21 +60,26 @@ const FriendsScreen = ({ navigation }: any) => {
   }, [currentUser?.uid]);
 
   const findUser = async () => {
-    const term = normalize(searchText);
-    if (!term || !currentUser || !profile) {
+    const rawTerm = searchText.trim();
+    const normalizedTerm = normalize(rawTerm);
+    if (!rawTerm || !currentUser) {
       return null;
     }
 
-    if (term === currentUser.uid || term === profile.email || term === profile.displayNameLower) {
+    if (
+      rawTerm === currentUser.uid ||
+      normalizedTerm === normalize(currentUser.email) ||
+      normalizedTerm === profile?.displayNameLower
+    ) {
       Alert.alert('不能加入自己', '請搜尋其他使用者');
       return null;
     }
 
-    return searchUser(term);
+    return searchUser(rawTerm);
   };
 
   const addFriend = async () => {
-    if (!currentUser || !profile) {
+    if (!currentUser) {
       return;
     }
 
@@ -82,11 +87,11 @@ const FriendsScreen = ({ navigation }: any) => {
     try {
       const friend = await findUser();
       if (!friend) {
-        Alert.alert('找不到使用者', '請用 UID、Email 或顯示名稱搜尋。你也可以試 demo1@example.com、demo2@example.com 或 demo3@example.com。');
+        Alert.alert('找不到使用者', '請用對方的 UID、Email 或完整顯示名稱搜尋。');
         return;
       }
 
-      if (profile.friendIds.includes(friend.uid)) {
+      if (friends.some((item) => item.uid === friend.uid)) {
         Alert.alert('已經是好友', `${friend.displayName} 已在好友清單中`);
         return;
       }
@@ -149,14 +154,14 @@ const FriendsScreen = ({ navigation }: any) => {
       </View>
 
       <Text style={styles.helperText}>
-        測試用帳號：demo1@example.com / demo2@example.com / demo3@example.com，密碼 123456
+        請輸入另一台裝置已註冊的 Email、UID 或完整顯示名稱。
       </Text>
 
       <FlatList
         data={friends}
         renderItem={renderFriend}
         keyExtractor={(item) => item.uid}
-        ListEmptyComponent={<Text style={styles.emptyText}>還沒有好友。搜尋 demo1@example.com、demo2@example.com 或 demo3@example.com 可以立即測試。</Text>}
+        ListEmptyComponent={<Text style={styles.emptyText}>還沒有好友。請先讓兩位組員註冊，再用 Email 搜尋並加入。</Text>}
       />
     </View>
   );

@@ -28,7 +28,7 @@ const TimelineScreen = () => {
       id: '1',
       author: 'MyChatApp',
       timestamp: '剛剛',
-      content: '網路 API 版本已啟用。帳號、好友、聊天室和訊息會儲存在 API server。',
+      content: 'Firebase 雲端版已啟用。帳號、好友、聊天室和訊息會跨裝置即時同步。',
       accent: '#0A66C2',
       likes: 45,
       comments: 12,
@@ -39,7 +39,7 @@ const TimelineScreen = () => {
       id: '2',
       author: 'Local Demo',
       timestamp: '今天',
-      content: '可以用 demo1@example.com 和 demo2@example.com 測試加好友與聊天，密碼都是 123456。',
+      content: '教師機與學生端只要能連上 Internet，不必使用相同 Wi-Fi，也不必設定 IP。',
       accent: '#1F8A70',
       likes: 128,
       comments: 34,
@@ -79,7 +79,7 @@ const TimelineScreen = () => {
 
       <View style={[styles.demoPanel, { borderLeftColor: item.accent }]}>
         <Text style={styles.demoPanelTitle}>{item.author}</Text>
-        <Text style={styles.demoPanelText}>Network API demo</Text>
+        <Text style={styles.demoPanelText}>Firebase cloud demo</Text>
       </View>
 
       <View style={styles.postStats}>

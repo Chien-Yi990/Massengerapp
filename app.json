@@ -10,13 +10,6 @@
       "supportsTablet": true
     },
     "plugins": [
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "允許應用訪問你的相冊以設定頭像",
-          "cameraPermission": "允許應用訪問相機"
-        }
-      ],
       "expo-font"
     ]
   }

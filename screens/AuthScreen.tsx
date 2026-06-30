@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { registerUser, signInUser } from '../services/database';
+import { registerUser, resetUserPassword, signInUser } from '../services/database';
 
 const AuthScreen = () => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -19,6 +19,7 @@ const AuthScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async () => {
     if (!email.trim() || !password.trim()) {
@@ -32,6 +33,7 @@ const AuthScreen = () => {
     }
 
     setLoading(true);
+    setErrorMessage('');
     try {
       if (mode === 'register') {
         await registerUser(email, password, displayName);
@@ -39,7 +41,27 @@ const AuthScreen = () => {
         await signInUser(email, password);
       }
     } catch (error: any) {
-      Alert.alert('登入失敗', error.message ?? '請稍後再試');
+      const message = error.message ?? '請稍後再試';
+      setErrorMessage(message);
+      Alert.alert(mode === 'login' ? '登入失敗' : '註冊失敗', message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!email.trim()) {
+      setErrorMessage('請先輸入註冊時使用的 Email');
+      return;
+    }
+
+    setLoading(true);
+    setErrorMessage('');
+    try {
+      await resetUserPassword(email);
+      Alert.alert('重設信已寄出', '請到信箱開啟 Firebase 寄出的連結並設定新密碼。');
+    } catch (error: any) {
+      setErrorMessage(error.message ?? '無法寄送密碼重設信');
     } finally {
       setLoading(false);
     }
@@ -55,7 +77,7 @@ const AuthScreen = () => {
           <FontAwesome name="comments" color="#FFFFFF" size={34} />
         </View>
         <Text style={styles.title}>MyChatApp</Text>
-        <Text style={styles.subtitle}>使用網路 API 儲存資料的聊天 App</Text>
+        <Text style={styles.subtitle}>使用 Firebase 即時同步的聊天 App</Text>
 
         {mode === 'register' && (
           <TextInput
@@ -85,6 +107,8 @@ const AuthScreen = () => {
           onChangeText={setPassword}
         />
 
+        {!!errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+
         <TouchableOpacity style={styles.primaryButton} onPress={handleSubmit} disabled={loading}>
           {loading ? (
             <ActivityIndicator color="#FFFFFF" />
@@ -92,6 +116,16 @@ const AuthScreen = () => {
             <Text style={styles.primaryButtonText}>{mode === 'login' ? '登入' : '註冊'}</Text>
           )}
         </TouchableOpacity>
+
+        {mode === 'login' && (
+          <TouchableOpacity
+            style={styles.resetButton}
+            onPress={handleResetPassword}
+            disabled={loading}
+          >
+            <Text style={styles.resetText}>忘記密碼？寄送重設信</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity
           style={styles.switchButton}
@@ -160,6 +194,20 @@ const styles = StyleSheet.create({
     minHeight: 48,
     justifyContent: 'center',
     marginTop: 4,
+  },
+  errorText: {
+    color: '#B42318',
+    fontSize: 13,
+    marginBottom: 10,
+  },
+  resetButton: {
+    alignItems: 'center',
+    paddingTop: 14,
+  },
+  resetText: {
+    color: '#0A66C2',
+    fontSize: 13,
+    fontWeight: '600',
   },
   primaryButtonText: {
     color: '#FFFFFF',
